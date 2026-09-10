@@ -262,9 +262,10 @@ body.mode-online .board-col:last-child .board-label{ font-size:.78rem; }
 body.mode-online .board-col:last-child .vs-hud{ font-size:.7rem; }
 
 body.device-mobile.mode-online .board-col:last-child{
-  width:92px;
-  top:max(env(safe-area-inset-top),6px);
-  right:6px;
+  top:calc(var(--online-bar-h, 260px) + env(safe-area-inset-top) + 14px);
+  left:6px;
+  right:auto;
+  width:calc(var(--online-bar-w, 96px) - 6px);
 }
 body.device-mobile.mode-online .board-col:last-child .board-label{ font-size:.6rem; }
 body.device-mobile.mode-online .board-col:last-child .vs-hud{ font-size:.56rem; }
