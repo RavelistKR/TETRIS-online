@@ -89,12 +89,12 @@
     style.textContent = `
       .touch-controls{position:fixed;inset:0;z-index:30;pointer-events:none;display:none;}
       body.device-mobile .touch-controls.tv-ready{display:block;}
-      .tv-joystick{position:absolute;left:max(env(safe-area-inset-left),16px);bottom:max(env(safe-area-inset-bottom),16px);
+      .tv-joystick{position:absolute;left:max(env(safe-area-inset-left),16px);bottom:max(env(safe-area-inset-bottom),56px);
         width:clamp(96px,26vmin,140px);height:clamp(96px,26vmin,140px);border-radius:50%;
         background:rgba(255,255,255,.08);border:2px solid rgba(255,255,255,.18);pointer-events:auto;touch-action:none;}
       .tv-joystick-knob{position:absolute;left:50%;top:50%;width:44%;height:44%;border-radius:50%;
         background:rgba(255,255,255,.35);transform:translate(-50%,-50%);pointer-events:none;}
-      .tv-buttons{position:absolute;right:max(env(safe-area-inset-right),16px);bottom:max(env(safe-area-inset-bottom),16px);
+      .tv-buttons{position:absolute;right:max(env(safe-area-inset-right),16px);bottom:max(env(safe-area-inset-bottom),56px);
         display:grid;grid-template-columns:repeat(2,1fr);gap:10px;pointer-events:auto;}
       .tv-btn{width:clamp(52px,14vmin,68px);height:clamp(52px,14vmin,68px);border-radius:50%;
         background:rgba(255,255,255,.1);border:2px solid rgba(255,255,255,.2);color:#fff;font-size:.85rem;font-weight:700;
