@@ -1,0 +1,350 @@
+/* ===== Tetris - style.css (전체 교체, 온라인 대전 좌측 툴바+HOLD/NEXT, 우측 미니맵) ===== */
+:root{
+  --bg-dark:#0a0e1a; --bg-darker:#050810;
+  --panel-bg:rgba(22,27,46,0.6); --panel-border:rgba(255,255,255,0.12);
+  --panel-blur:16px;
+  --text-main:#f1f5f9; --text-dim:#94a3b8;
+  --accent-default:#7dd3fc; --accent-2:#a78bfa;
+  --success:#4ade80; --warning:#fbbf24; --danger:#f87171;
+  --p1-color:#38bdf8; --p2-color:#f472b6;
+  --online-bar-w:96px; /* resize.js가 실제 좌측 바 폭을 측정해서 이 값을 매번 덮어씁니다 */
+}
+*{box-sizing:border-box;}
+html,body{
+  margin:0;padding:0;width:100%;height:100%;overflow:hidden;
+  background:radial-gradient(circle at 50% 15%,#101a30 0%,var(--bg-darker) 75%);
+  color:var(--text-main);font-family:'Chakra Petch','Noto Sans KR',sans-serif;
+  -webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;
+}
+
+/* ---- 화면 전환 ---- */
+.screen{position:fixed;inset:0;z-index:10;display:none;align-items:center;justify-content:center;width:100%;height:100%;padding:24px;overflow-y:auto;overflow-x:hidden;}
+.screen.active{display:flex;}
+
+/* ---- 공통 패널 ---- */
+.panel{position:relative;width:min(520px,92vw);padding:34px 38px;border-radius:22px;
+  background:var(--panel-bg);border:1px solid var(--panel-border);
+  backdrop-filter:blur(var(--panel-blur));-webkit-backdrop-filter:blur(var(--panel-blur));
+  box-shadow:0 20px 60px rgba(0,0,0,0.5);display:flex;flex-direction:column;align-items:center;
+  max-width:100%;overflow-wrap:break-word;}
+.panel-title{font-family:'Orbitron',sans-serif;font-size:1.4rem;font-weight:800;margin:0 0 6px;text-align:center;}
+.setup-note{font-size:0.85rem;color:var(--text-dim);text-align:center;margin:0 0 20px;line-height:1.5;}
+
+/* ---- 로고 ---- */
+.logo{font-family:'Orbitron',sans-serif;font-size:clamp(2rem,5vw,2.8rem);font-weight:900;letter-spacing:.08em;text-align:center;
+  background:linear-gradient(135deg,#7dd3fc 0%,#a78bfa 50%,#fb7185 100%);-webkit-background-clip:text;background-clip:text;color:transparent;
+  animation:logoGlow 4s ease-in-out infinite alternate;}
+@keyframes logoGlow{from{filter:drop-shadow(0 0 6px rgba(125,211,252,.35));}to{filter:drop-shadow(0 0 18px rgba(167,139,250,.55));}}
+.subtitle{font-size:.8rem;letter-spacing:.12em;color:var(--text-dim);text-align:center;margin:6px 0 28px;}
+
+/* ---- 모드 카드 ---- */
+.mode-grid{display:grid;grid-template-columns:repeat(2,minmax(160px,220px));gap:16px;width:100%;}
+.mode-card{--accent:#7dd3fc;position:relative;padding:20px 14px;border-radius:14px;border:1px solid var(--panel-border);
+  background:rgba(255,255,255,.04);color:var(--text-main);cursor:pointer;font-family:inherit;
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  transition:transform .15s ease,box-shadow .15s ease,border-color .15s ease,background .15s ease;}
+.mode-card .mode-icon{font-size:1.8rem;}
+.mode-card .mode-title{font-weight:700;font-size:1rem;}
+.mode-card .mode-desc{font-size:.76rem;color:var(--text-dim);text-align:center;}
+.mode-card:hover{transform:translateY(-4px);border-color:var(--accent);background:rgba(255,255,255,.07);box-shadow:0 10px 26px rgba(125,211,252,.28);}
+.mode-card:active{transform:translateY(-1px) scale(.97);}
+.mode-card[hidden]{display:none !important;}
+
+/* ---- 버튼 ---- */
+.btn{font-family:inherit;font-size:.9rem;padding:11px 22px;border-radius:10px;border:1px solid var(--panel-border);cursor:pointer;
+  transition:transform .1s ease,filter .15s ease,background .15s ease;background:rgba(255,255,255,.05);color:var(--text-main);}
+.btn:active{transform:scale(.96);}
+.btn-primary{background:linear-gradient(135deg,#7dd3fc 0%,#a78bfa 100%);color:#0a0e1a;font-weight:700;border:none;}
+.btn-primary:hover{filter:brightness(1.1);}
+.btn-ghost{background:rgba(255,255,255,.05);color:var(--text-main);}
+.btn-tiny{padding:4px 10px;font-size:.72rem;border-radius:6px;}
+.btn-row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;}
+.icon-btn{width:40px;height:40px;border-radius:50%;border:1px solid var(--panel-border);background:rgba(255,255,255,.06);
+  color:var(--text-main);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1.1rem;}
+.icon-btn:active{transform:scale(.92);}
+
+/* ---- 설정 화면 ---- */
+.key-settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 20px;width:100%;margin:14px 0;}
+.key-col-title{font-weight:700;margin-bottom:8px;text-align:center;color:var(--accent-default);}
+.key-row{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px;}
+.key-badge{padding:8px 10px;border-radius:8px;background:rgba(255,255,255,.05);border:1px solid var(--panel-border);
+  color:var(--text-main);font-size:.82rem;cursor:pointer;min-width:96px;text-align:center;}
+.key-badge.listening{border-color:var(--accent-default);box-shadow:0 0 0 2px rgba(125,211,252,.3) inset;}
+.settings-divider{width:100%;height:1px;background:var(--panel-border);margin:18px 0;}
+.settings-section{width:100%;}
+.settings-section-title{font-weight:700;margin-bottom:10px;}
+.check-row{display:flex;align-items:center;gap:8px;margin-bottom:14px;font-size:.9rem;cursor:pointer;}
+.device-mode-row{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
+.key-label{font-size:.9rem;color:var(--text-dim);}
+.segmented{display:flex;border:1px solid var(--panel-border);border-radius:10px;overflow:hidden;}
+.segment-btn{padding:8px 14px;border:none;background:rgba(255,255,255,.04);color:var(--text-main);cursor:pointer;font-family:inherit;font-size:.85rem;}
+.segment-btn.active{background:linear-gradient(135deg,#7dd3fc 0%,#a78bfa 100%);color:#0a0e1a;font-weight:700;}
+
+/* ---- 온라인 설정 ---- */
+.online-panel{width:100%;display:flex;flex-direction:column;align-items:center;gap:10px;margin:14px 0;}
+.or-sep{font-size:.75rem;color:var(--text-dim);}
+.online-panel input[type="text"]{width:100%;padding:10px 12px;border-radius:8px;border:1px solid var(--panel-border);
+  background:rgba(255,255,255,.05);color:var(--text-main);font-size:1rem;text-align:center;letter-spacing:.1em;}
+.online-status{font-size:.85rem;color:var(--text-dim);margin:8px 0;text-align:center;}
+.room-code-display{font-family:'Orbitron',sans-serif;font-size:1.6rem;font-weight:800;letter-spacing:.2em;color:var(--accent-default);margin-bottom:10px;}
+
+/* ---- 게임 화면 공통 ---- */
+.game-screen{padding:0;display:none;}
+.game-screen.active{display:block;}
+.top-bar{position:absolute;top:0;left:0;right:0;height:52px;display:flex;align-items:center;gap:8px;
+  padding:0 14px;z-index:20;background:linear-gradient(180deg,rgba(5,8,16,.75),transparent);}
+.ping-status{margin-left:auto;font-size:.75rem;color:var(--text-dim);}
+
+/* ---- 조작법 / TIP 힌트 패널 ---- */
+.side-hint{
+  position:absolute;top:60px;bottom:0;width:190px;z-index:5;padding:14px;overflow-y:auto;
+  background:rgba(15,20,35,.5);border:1px solid var(--panel-border);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+}
+.side-hint-left{left:0;border-radius:0 14px 14px 0;}
+.side-hint-right{right:0;border-radius:14px 0 0 14px;}
+.hint-title{font-weight:800;font-size:.78rem;letter-spacing:.08em;color:var(--accent-default);
+  margin-bottom:10px;text-transform:uppercase;}
+.hint-row{display:flex;justify-content:space-between;align-items:center;gap:8px;
+  font-size:.74rem;color:var(--text-dim);padding:5px 0;border-bottom:1px dashed rgba(255,255,255,.08);}
+.hint-row:last-child{border-bottom:none;}
+.hint-row span:last-child{color:var(--text-main);font-weight:600;}
+.hint-tip{font-size:.76rem;color:var(--text-dim);line-height:1.7;}
+
+/* ---- 솔로 플레이 영역 ---- */
+.play-area{position:relative;width:100%;height:100%;display:flex;align-items:center;justify-content:center;gap:24px;padding-top:52px;}
+canvas#canvasSolo,canvas#canvasP1,canvas#canvasP2{background:#000;border-radius:6px;box-shadow:0 0 0 2px rgba(255,255,255,.06);}
+
+.side-panel{display:flex;flex-direction:column;gap:10px;z-index:4;}
+.mini-box,.score-box{background:rgba(15,20,35,.55);border:1px solid var(--panel-border);border-radius:10px;
+  padding:8px 12px;text-align:center;backdrop-filter:blur(6px);}
+.mini-box .mini-label{font-size:.62rem;letter-spacing:.1em;color:var(--text-dim);margin-bottom:4px;}
+.mini-box canvas{display:block;margin:0 auto;}
+.score-box{font-size:.62rem;letter-spacing:.1em;color:var(--text-dim);font-weight:700;}
+.score-box span{display:block;font-family:'Orbitron',sans-serif;font-weight:700;font-size:1.05rem;color:var(--text-main);margin-top:2px;}
+
+.next-preview-panel{display:flex;flex-direction:column;gap:8px;}
+
+/* ---- 대전 화면 (로컬 노멀/아이템: 기본 좌우 분할) ---- */
+.versus-area{display:flex;align-items:center;justify-content:center;gap:28px;width:100%;height:100%;padding-top:52px;}
+.board-col{display:flex;flex-direction:column;align-items:center;gap:6px;}
+.board-label{font-weight:700;font-size:.9rem;color:var(--text-dim);}
+.mini-row{display:flex;gap:8px;}
+.mini-box.small{padding:4px 8px;}
+.mini-box.small .mini-label{font-size:.55rem;margin-bottom:2px;}
+.vs-hud{display:flex;align-items:center;gap:10px;font-size:.8rem;color:var(--text-dim);}
+.vs-hud b{color:var(--text-main);}
+.item-row{display:flex;align-items:center;gap:6px;font-size:.75rem;}
+.item-slot{padding:2px 8px;border-radius:6px;background:rgba(255,255,255,.08);}
+
+/* ---- 토스트 알림 ---- */
+.fog-toast{
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:60;
+  background:rgba(20,25,40,.92);border:1px solid var(--panel-border);
+  padding:10px 20px;border-radius:20px;font-size:.85rem;color:var(--text-main);
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  animation:toastPop .25s ease;box-shadow:0 10px 30px rgba(0,0,0,.4);
+  max-width:88vw;text-align:center;
+}
+@keyframes toastPop{from{opacity:0;transform:translate(-50%,10px);}to{opacity:1;transform:translate(-50%,0);}}
+
+/* ==========================================================
+   오버레이: 일시정지 / 결과 / 커스텀 모달
+   ========================================================== */
+#pauseOverlay,#resultOverlay,#customModal{
+  position:fixed;inset:0;z-index:50;display:none;
+  align-items:center;justify-content:center;
+  background:rgba(5,8,16,.72);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
+}
+#pauseOverlay.active,#resultOverlay.active,#customModal.active{display:flex;}
+
+.pause-panel,.result-panel,.modal-panel{
+  width:min(340px,86vw);padding:30px 26px;border-radius:20px;
+  background:var(--panel-bg);border:1px solid var(--panel-border);
+  backdrop-filter:blur(var(--panel-blur));-webkit-backdrop-filter:blur(var(--panel-blur));
+  box-shadow:0 20px 60px rgba(0,0,0,.5);
+  display:flex;flex-direction:column;align-items:center;gap:18px;text-align:center;
+}
+.pause-title,.result-title{font-family:'Orbitron',sans-serif;font-size:1.5rem;font-weight:900;letter-spacing:.06em;}
+.result-title{color:var(--danger);}
+.modal-message{font-size:.95rem;line-height:1.6;white-space:pre-line;}
+
+/* ==========================================================
+   온라인 대전 전용 레이아웃
+   - #onlineLeftBar : js/screens.js의 enterOnlineLayout()이 실제 버튼/HOLD/NEXT/SCORE
+     DOM 노드를 이 컨테이너 "안으로" 옮겨 넣습니다. 이 컨테이너는 flex column이라
+     안에 몇 개가 들어오든 자동으로 위에서부터 순서대로 쌓이므로, 항목별 top 좌표를
+     사람이 계산할 필요가 없습니다.
+   - resize.js가 이 바의 실제 렌더링 폭을 매 리사이즈마다 측정해서
+     --online-bar-w 변수에 반영하고, 내 보드(P1) 컨테이너는 그 변수만큼 padding-left를
+     주고 남는 공간에서 중앙정렬 + 위쪽 정렬됩니다.
+   - 상대 보드(P2)는 우측 상단에 고정. top/right만 사용하고 bottom은 절대 같이
+     지정하지 않습니다(동시 지정 시 컨테이너가 세로로 늘어나는 버그의 원인이었음).
+   ========================================================== */
+body.mode-online .top-bar{ display:none; }
+body.mode-online .side-hint{ display:none !important; }
+
+body.mode-online .versus-area{
+  display:block;
+  position:relative;
+  width:100%;
+  height:100%;
+}
+
+#onlineLeftBar{
+  position:fixed;
+  top:0;
+  left:0;
+  bottom:auto;               /* top만 사용, bottom은 절대 같이 지정하지 않음 */
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:10px;
+  padding:calc(env(safe-area-inset-top) + 10px) 10px 12px;
+  z-index:35;
+  background:linear-gradient(180deg,rgba(10,14,26,.92),rgba(10,14,26,.6) 75%,transparent);
+  border-radius:0 16px 16px 0;
+  max-height:92vh;
+  overflow-y:auto;
+}
+.online-icon-wrap{display:flex;flex-direction:column;gap:8px;align-items:center;}
+#onlineLeftBar .icon-btn{width:34px;height:34px;font-size:.95rem;}
+#onlineLeftBar .ping-status{margin:0;font-size:.6rem;text-align:center;color:var(--text-dim);max-width:74px;}
+#onlineLeftBar .mini-row{margin:0;}
+#onlineLeftBar .mini-row.online-vertical{flex-direction:column;gap:6px;}
+#onlineLeftBar .mini-box.small{padding:3px 6px;}
+#onlineLeftBar .mini-box.small .mini-label{font-size:.52rem;}
+#onlineLeftBar .vs-hud{
+  flex-direction:column;align-items:center;gap:2px;
+  font-size:.66rem;text-align:center;
+}
+#onlineLeftBar .item-row{flex-direction:column;gap:4px;font-size:.62rem;}
+
+body.device-mobile #onlineLeftBar{
+  padding:calc(env(safe-area-inset-top) + 8px) 6px 8px;
+  gap:6px;
+}
+body.device-mobile #onlineLeftBar .icon-btn{width:28px;height:28px;font-size:.8rem;}
+
+/* 내 보드(P1): 좌측 바 폭만큼 안쪽 여백을 주고, .board-col 기본값(column, 가로중앙,
+   세로는 flex-start=위쪽 정렬)을 그대로 활용해 남는 영역 위쪽에 표시합니다. */
+body.mode-online .board-col:first-child{
+  position:fixed;
+  inset:0;
+  padding-top:max(env(safe-area-inset-top),8px);
+  padding-left:var(--online-bar-w);
+  z-index:1;
+}
+body.mode-online .board-col:first-child > .board-label{ display:none; }
+
+/* 상대 보드(P2): 우측 상단 작은 카드. top/right만 사용 */
+body.mode-online .board-col:last-child{
+  position:fixed;
+  top:max(env(safe-area-inset-top),8px);
+  right:8px;
+  left:auto;
+  bottom:auto;
+  width:194px;
+  height:auto;
+  max-height:none;
+  overflow:hidden;
+  z-index:20;
+  background:rgba(10,14,26,0.85);
+  border:1px solid var(--panel-border);
+  border-radius:10px;
+  padding:4px;
+  box-shadow:0 4px 12px rgba(0,0,0,0.4);
+  pointer-events:none;
+}
+body.mode-online .board-col:last-child .side-panel,
+body.mode-online .board-col:last-child .mini-box{ display:none; }
+body.mode-online .board-col:last-child .board-label{ font-size:.78rem; }
+body.mode-online .board-col:last-child .vs-hud{ font-size:.7rem; }
+
+body.device-mobile.mode-online .board-col:last-child{
+  width:92px;
+  top:max(env(safe-area-inset-top),6px);
+  right:6px;
+}
+body.device-mobile.mode-online .board-col:last-child .board-label{ font-size:.6rem; }
+body.device-mobile.mode-online .board-col:last-child .vs-hud{ font-size:.56rem; }
+
+/* ==========================================================
+   모바일 전용 (body.device-mobile) - 솔로 / 로컬 대전용
+   ========================================================== */
+body.device-mobile .side-hint{display:none !important;}
+
+body.device-mobile #btnModeDuo,
+body.device-mobile #btnModeItem{display:none !important;}
+
+body.device-mobile .panel{
+  width:min(92vw,420px);
+  padding:28px 20px;
+}
+body.device-mobile .mode-grid{
+  grid-template-columns:1fr;
+  gap:12px;
+}
+body.device-mobile .mode-card{width:100%;}
+body.device-mobile .key-settings-grid{
+  grid-template-columns:1fr;
+  gap:16px;
+}
+
+body.device-mobile .top-bar{
+  height:calc(env(safe-area-inset-top) + 46px);
+  padding-top:env(safe-area-inset-top);
+}
+
+body.device-mobile .play-area{position:fixed;inset:0;padding:0;gap:0;}
+body.device-mobile:not(.mode-online) .versus-area{position:fixed;inset:0;padding-top:calc(env(safe-area-inset-top) + 46px);gap:8px;}
+
+body.device-mobile canvas#canvasSolo{
+  position:absolute;inset:0;margin:auto;
+  max-width:100vw;max-height:100vh;z-index:1;
+}
+
+body.device-mobile .mini-box:has(#holdSolo){
+  position:fixed;right:calc(env(safe-area-inset-right) + 6px);
+  top:calc(env(safe-area-inset-top) + 54px);z-index:15;
+}
+body.device-mobile .score-box:has(#scoreSolo){
+  position:fixed;left:calc(env(safe-area-inset-left) + 6px);
+  top:calc(env(safe-area-inset-top) + 54px);z-index:15;
+}
+body.device-mobile .score-box:has(#linesSolo){
+  position:fixed;left:calc(env(safe-area-inset-left) + 6px);
+  top:calc(env(safe-area-inset-top) + 96px);z-index:15;
+}
+body.device-mobile .next-preview-panel#nextPanelSolo{
+  position:fixed;right:calc(env(safe-area-inset-right) + 6px);
+  top:calc(env(safe-area-inset-top) + 120px);
+  flex-direction:column;gap:6px;z-index:15;
+}
+
+body.device-mobile .mini-box,
+body.device-mobile .score-box{
+  padding:5px 9px;transform:scale(.85);transform-origin:top;
+  background:rgba(10,14,26,.72);
+}
+body.device-mobile .mini-box .mini-label,
+body.device-mobile .score-box{font-size:.56rem;}
+body.device-mobile .score-box span{font-size:.9rem;}
+
+@media (max-width:340px){
+  body.device-mobile .mini-box,body.device-mobile .score-box{transform:scale(.75);}
+}
+@media (orientation:landscape){
+  body.device-mobile .mini-box:has(#holdSolo),
+  body.device-mobile .score-box:has(#scoreSolo),
+  body.device-mobile .next-preview-panel#nextPanelSolo{top:calc(env(safe-area-inset-top) + 40px);}
+  body.device-mobile .score-box:has(#linesSolo){top:calc(env(safe-area-inset-top) + 78px);}
+}
+
+/* 로컬 대전(노멀/아이템) 모바일: 기존 좌우 분할 유지 (온라인과 무관) */
+body.device-mobile.mode-duo .versus-area,
+body.device-mobile.mode-item .versus-area{flex-direction:row;padding-top:calc(env(safe-area-inset-top) + 46px);}
+body.device-mobile.mode-duo .versus-area canvas,
+body.device-mobile.mode-item .versus-area canvas{max-height:66vh;}
+body.device-mobile.mode-duo .mini-row,
+body.device-mobile.mode-item .mini-row{transform:scale(.85);transform-origin:top;}
