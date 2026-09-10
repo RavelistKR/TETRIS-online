@@ -45,6 +45,16 @@
     return Math.ceil(bar.getBoundingClientRect().width);
   }
 
+  // 추가: 좌측 바의 실제 높이를 측정합니다.
+  // 상대 보드(P2)를 이 바 바로 아래에 배치할 때 기준값으로 사용됩니다.
+  // 아이콘/HOLD·NEXT/SCORE 구성이 바뀌어도 항상 정확한 위치에 붙도록
+  // 폭(width)과 동일한 방식으로 매 리사이즈마다 실측합니다.
+  function measureOnlineBarHeight() {
+    const bar = document.getElementById('onlineLeftBar');
+    if (!bar) return 0;
+    return Math.ceil(bar.getBoundingClientRect().height);
+  }
+
   function resizeBoards() {
     const mobile = isMobileMode();
     const viewport = getViewportSize();
@@ -86,6 +96,14 @@
         barWidth = mobile ? 74 : 110;
       }
       document.documentElement.style.setProperty('--online-bar-w', barWidth + 'px');
+
+      // 추가: 좌측 바 높이를 --online-bar-h로 반영
+      // (모바일에서 상대 보드를 이 바로 아래에 배치할 때 CSS가 이 변수를 참조합니다)
+      let barHeight = measureOnlineBarHeight();
+      if (!barHeight) {
+        barHeight = mobile ? 240 : 260;
+      }
+      document.documentElement.style.setProperty('--online-bar-h', barHeight + 'px');
 
       const safeTop = 8;
       const safeBottom = mobile ? 8 : 10;
