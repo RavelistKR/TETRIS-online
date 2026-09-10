@@ -1,25 +1,32 @@
+// js/online.js
 // 통신사 이동통신망(4G/5G)처럼 서로 다른 네트워크 간에는 STUN만으로는
 // P2P 직접 연결이 실패하는 경우가 많아, TURN(중계) 서버를 반드시 추가해야 합니다.
-// 아래는 테스트용 공개 TURN(openrelay)을 포함한 설정입니다.
+// 아래는 metered.ca에서 발급받은 전용 TURN 자격증명을 사용한 설정입니다.
 const ICE_CONFIG = {
   iceServers: [
     { urls: 'stun:stun.l.google.com:19302' },
     { urls: 'stun:stun1.l.google.com:19302' },
     { urls: 'stun:global.stun.twilio.com:3478' },
+    { urls: 'stun:stun.relay.metered.ca:80' },
     {
-      urls: 'turn:openrelay.metered.ca:80',
-      username: 'openrelayproject',
-      credential: 'openrelayproject'
+      urls: 'turn:global.relay.metered.ca:80',
+      username: '4049c8339e5df0cb85ecd0ae',
+      credential: 'y1x/uVP6elqJeFHM'
     },
     {
-      urls: 'turn:openrelay.metered.ca:443',
-      username: 'openrelayproject',
-      credential: 'openrelayproject'
+      urls: 'turn:global.relay.metered.ca:80?transport=tcp',
+      username: '4049c8339e5df0cb85ecd0ae',
+      credential: 'y1x/uVP6elqJeFHM'
     },
     {
-      urls: 'turn:openrelay.metered.ca:443?transport=tcp',
-      username: 'openrelayproject',
-      credential: 'openrelayproject'
+      urls: 'turn:global.relay.metered.ca:443',
+      username: '4049c8339e5df0cb85ecd0ae',
+      credential: 'y1x/uVP6elqJeFHM'
+    },
+    {
+      urls: 'turns:global.relay.metered.ca:443?transport=tcp',
+      username: '4049c8339e5df0cb85ecd0ae',
+      credential: 'y1x/uVP6elqJeFHM'
     }
   ]
 };
@@ -41,7 +48,7 @@ function startConnectTimeout(statusEl) {
     if (!App.online.connected) {
       statusEl.textContent = '연결 시간 초과. 같은 Wi-Fi인지, 코드가 정확한지 확인 후 다시 시도해주세요.';
     }
-  }, 15000);
+  }, 30000);
 }
 
 function createRoom(itemsEnabled) {
@@ -115,6 +122,17 @@ function setupOnlineConn(conn, statusEl, onOpen) {
     App.online.connected = true;
     document.getElementById('onlinePingStatus').style.display = 'inline';
     document.getElementById('onlinePingStatus').textContent = '온라인 연결됨';
+
+    // 진단용 로그: 문제가 생기면 콘솔에서 원인을 바로 확인할 수 있습니다.
+    if (conn.peerConnection) {
+      conn.peerConnection.oniceconnectionstatechange = function () {
+        console.log('[online] ICE state:', conn.peerConnection.iceConnectionState);
+      };
+      conn.peerConnection.onicecandidateerror = function (e) {
+        console.warn('[online] ICE candidate error:', e.errorText, e.url);
+      };
+    }
+
     if (onOpen) {
       onOpen();
     }
